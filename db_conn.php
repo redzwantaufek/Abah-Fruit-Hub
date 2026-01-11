@@ -2,7 +2,7 @@
 
 /* php & Oracle DB connection file */
 
-$user = "SYSTEM";
+$username = "SYSTEM";
 $password = "123";
 $database = "localhost/FREEPDB1"; // Format: host/service_name
 
