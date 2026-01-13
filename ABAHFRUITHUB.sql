@@ -84,6 +84,7 @@ CREATE TABLE FRUITS (
     
     CONSTRAINT fruitid_pk PRIMARY KEY (FruitId),
     CONSTRAINT fruitname_nn CHECK (FruitName IS NOT NULL),
+    CONSTRAINT quantitystock_ck CHECK (QuantityStock >= 0),
     CONSTRAINT expiredate_nn CHECK (ExpireDate IS NOT NULL),
     CONSTRAINT supplierid_fk3 FOREIGN KEY (SupplierId) REFERENCES SUPPLIER(SupplierId)
 );
@@ -101,9 +102,6 @@ CREATE TABLE ORDERS (
     CONSTRAINT ordercustId_fk FOREIGN KEY (CustId) REFERENCES CUSTOMER(CustId),
     CONSTRAINT orderstaffId_fk FOREIGN KEY (StaffId) REFERENCES STAFFS(StaffId)
 );
-
-INSERT INTO ORDERS (OrderId, OrderDate, CustId, StaffId, TotalAmount, PaymentMethod, OrderStatus) 
-VALUES (4000, SYSDATE, 100, 3002, 30.00, 'CASH', 'COMPLETED');
 
 CREATE TABLE ORDERDETAILS (
     OrderDetailsId NUMBER(10),
