@@ -67,11 +67,7 @@ if (isset($_POST['login'])) {
     }
     
     oci_free_statement($stid_staff);
-    oci_close($dbconn);
-    
-} else {
-    header("Location: login.php");
-    exit();
+    oci_close($dbconn);  
 }
 ?>
 <!DOCTYPE html>
