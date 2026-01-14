@@ -37,8 +37,8 @@ if (isset($_POST['login'])) {
         // LANGKAH 2: Jika bukan Staff, semak jadual CUSTOMER pula
         // ---------------------------------------------------------
         // Nota: Jadual CUSTOMER tiada kolum 'Role', jadi kita set manual
-        $sql_cust = "SELECT CustId, CustName FROM CUSTOMER 
-                     WHERE CustEmail = :email AND CustPassword = :pass";
+        $sql_cust = "SELECT CUSTID, CUSTNAME FROM CUSTOMER 
+                     WHERE CUSTEMAIL = :email AND CUSTPASSWORD = :pass";
 
         $stid_cust = oci_parse($dbconn, $sql_cust);
         oci_bind_by_name($stid_cust, ":email", $email);
@@ -54,7 +54,7 @@ if (isset($_POST['login'])) {
             $_SESSION['user_role'] = 'CUSTOMER'; // Set secara manual
 
             // Hantar Customer ke halaman utama kedai (bukan dashboard admin)
-            header("Location: index.php"); 
+            header("Location: dashboard.php"); 
             exit();
         } else {
             // ---------------------------------------------------------
