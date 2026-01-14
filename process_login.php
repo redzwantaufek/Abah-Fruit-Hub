@@ -13,7 +13,7 @@ if (isset($_POST['login'])) {
     $sql = "SELECT StaffId, StaffName, StaffRole FROM STAFFS 
             WHERE StaffEmail = :email AND StaffPassword = :pass";
 
-    $stid = oci_parse($conn, $sql);
+    $stid = oci_parse($dbconn, $sql);
 
     // Mengikat pembolehubah PHP ke dalam SQL Oracle
     oci_bind_by_name($stid, ":email", $email);
