@@ -4,15 +4,16 @@ CREATE TABLE CUSTOMER (
     CustPhone VARCHAR2(20),
     CustEmail VARCHAR2(100),
     CustAddress VARCHAR2(255),
-    CustPassword VARCHAR2(15),
     
     CONSTRAINT custid_pk PRIMARY KEY (CustId),
     CONSTRAINT custname_nn CHECK (CustName IS NOT NULL),
     CONSTRAINT custemail_nn CHECK (CustEmail IS NOT NULL),
     CONSTRAINT custemail_uk UNIQUE (CustEmail),
     CONSTRAINT custaddress_nn CHECK (CustAddress IS NOT NULL),
-    CONSTRAINT custpass_nn CHECK (CustPassword IS NOT NULL)
 );
+COMMIT;
+ALTER TABLE CUSTOMER
+DROP COLUMN CustPassword;
 
 CREATE TABLE SUPPLIER (
     SupplierId NUMBER(5),
