@@ -1,3 +1,47 @@
+CREATE SEQUENCE cust_id_seq 
+INCREMENT BY 1
+START WITH 1000
+MAXVALUE 10000
+NOCACHE
+NOCYCLE;
+
+CREATE SEQUENCE staff_id_seq
+INCREMENT BY 1 
+START WITH 3000
+MAXVALUE 30000
+NOCACHE
+NOCYCLE;
+
+CREATE SEQUENCE supp_id_seq
+START WITH 5000
+INCREMENT BY 1 
+MAXVALUE 50000
+NOCACHE
+NOCYCLE;
+
+CREATE SEQUENCE fruit_id_seq
+START WITH 100
+INCREMENT BY 1
+MAXVALUE 1000
+NOCACHE
+NOCYCLE;
+
+CREATE SEQUENCE order_id_seq
+START WITH 4000 
+INCREMENT BY 1
+MAXVALUE 40000
+NOCACHE
+NOCYCLE;
+
+CREATE SEQUENCE orderdtl_id_seq 
+START WITH 1 
+INCREMENT BY 1 
+MAXVALUE 1000
+NOCACHE
+NOCYCLE;
+
+
+
 CREATE TABLE CUSTOMER (
     CustId NUMBER(5),
     CustName VARCHAR2(100),
@@ -9,11 +53,8 @@ CREATE TABLE CUSTOMER (
     CONSTRAINT custname_nn CHECK (CustName IS NOT NULL),
     CONSTRAINT custemail_nn CHECK (CustEmail IS NOT NULL),
     CONSTRAINT custemail_uk UNIQUE (CustEmail),
-    CONSTRAINT custaddress_nn CHECK (CustAddress IS NOT NULL),
+    CONSTRAINT custaddress_nn CHECK (CustAddress IS NOT NULL)
 );
-COMMIT;
-ALTER TABLE CUSTOMER
-DROP COLUMN CustPassword;
 
 CREATE TABLE SUPPLIER (
     SupplierId NUMBER(5),
@@ -29,7 +70,7 @@ CREATE TABLE SUPPLIER (
     CONSTRAINT supplieremail_nn CHECK (SupplierEmail IS NOT NULL),
     CONSTRAINT supplieremail_uk UNIQUE (SupplierEmail),
     CONSTRAINT suppliertype_nn CHECK (SupplierType IS NOT NULL),
-    CONSTRAINT suppliertype_type CHECK (SupplierType IN ( 'LOCALFARM', 'DISTRIBUTOR'))
+    CONSTRAINT suppliertype_type CHECK (SupplierType IN ('LOCALFARM', 'DISTRIBUTOR'))
 );
 
 CREATE TABLE LOCALFARM (
@@ -72,7 +113,6 @@ CREATE TABLE STAFFS (
     CONSTRAINT staffrole_ck CHECK (StaffRole IN ('ADMIN', 'STAFF'))
 );
 
-
 CREATE TABLE FRUITS (
     FruitId NUMBER(5),
     FruitName VARCHAR2(100),
@@ -87,7 +127,7 @@ CREATE TABLE FRUITS (
     CONSTRAINT fruitname_nn CHECK (FruitName IS NOT NULL),
     CONSTRAINT quantitystock_ck CHECK (QuantityStock >= 0),
     CONSTRAINT expiredate_nn CHECK (ExpireDate IS NOT NULL),
-    CONSTRAINT supplierid_fk3 FOREIGN KEY (SupplierId) REFERENCES SUPPLIER(SupplierId)
+    CONSTRAINT supplierid_fk3 FOREIGN KEY (SupplierId) REFERENCES SUPPLIER(SupplierId) ON DELETE SET NULL
 );
 
 CREATE TABLE ORDERS (
@@ -95,21 +135,71 @@ CREATE TABLE ORDERS (
     OrderDate DATE DEFAULT SYSDATE,
     CustId NUMBER(5),
     StaffId NUMBER(5),
-    TotalAmount NUMBER(10, 2) DEFAULT 0, -- Store the final total for faster reporting
-    PaymentMethod VARCHAR2(50), -- 'CASH', 'QR', 'CARD'
-    OrderStatus VARCHAR2(20) DEFAULT 'COMPLETED', -- 'COMPLETED', 'CANCELLED'
+    TotalAmount NUMBER(10, 2) DEFAULT 0, 
+    PaymentMethod VARCHAR2(50), 
+    OrderStatus VARCHAR2(20) DEFAULT 'COMPLETED', 
     
     CONSTRAINT orderid_pk PRIMARY KEY (OrderId),
-    CONSTRAINT ordercustId_fk FOREIGN KEY (CustId) REFERENCES CUSTOMER(CustId),
-    CONSTRAINT orderstaffId_fk FOREIGN KEY (StaffId) REFERENCES STAFFS(StaffId)
+    CONSTRAINT ordercustId_fk FOREIGN KEY (CustId) REFERENCES CUSTOMER(CustId) ON DELETE CASCADE,
+    CONSTRAINT orderstaffId_fk FOREIGN KEY (StaffId) REFERENCES STAFFS(StaffId) ON DELETE SET NULL
 );
 
 CREATE TABLE ORDERDETAILS (
     OrderDetailsId NUMBER(10),
     OrderId NUMBER(10),
     FruitId NUMBER(5),
-    Quantity NUMBER,
+    Quantity NUMBER(10),
+    
     CONSTRAINT orderdetailsId_pk PRIMARY KEY (OrderDetailsId),
-    CONSTRAINT orderdetails_orderid_fk FOREIGN KEY (OrderId) REFERENCES ORDERS(OrderId),
+    CONSTRAINT orderdetails_orderid_fk FOREIGN KEY (OrderId) REFERENCES ORDERS(OrderId) ON DELETE CASCADE,
     CONSTRAINT orderdetails_fruitid_fk FOREIGN KEY (FruitId) REFERENCES FRUITS(FruitId)
 );
+
+//TABLE STAFF
+INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
+VALUES (staff_id_seq.NEXTVAL, 'Miran bin Sudie', 5000, 'Merlimau, Melaka', 'admin@fruitstall.com', '012-1112222', NULL, 'admin123', 'ADMIN', SYSDATE);
+
+INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
+VALUES (staff_id_seq.NEXTVAL, 'Izzairi bin Syafiq', 2500, 'Jasin, Melaka', 'izzairi@fruitstall.com', '012-3334444', 3000, 'staffali', 'STAFF', SYSDATE);
+
+INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
+VALUES (staff_id_seq.NEXTVAL, 'Izzat bin Abu', 2500, 'Bandar Melaka', 'izzat@fruitstall.com', '012-5556666', 3000, 'staffizzat', 'STAFF', SYSDATE);
+
+//TABLE CUSTOMER
+INSERT INTO CUSTOMER (CustId, CustName, CustPhone, CustEmail, CustAddress)
+VALUES (cust_id_seq.NEXTVAL, 'Redzwan', '013-1234567', 'redzwan@gmail.com', 'Taman Seri Mendapat, Melaka');
+
+INSERT INTO CUSTOMER (CustId, CustName, CustPhone, CustEmail, CustAddress)
+VALUES (cust_id_seq.NEXTVAL, 'Niel', '017-9876543', 'niel@gmail.com', 'Taman Seri Mendapat, Melaka');
+
+//TABLE SUPPLIER
+INSERT INTO SUPPLIER (SupplierId, SupplierName, SupplierContact, SupplierPhone, SupplierEmail, SupplierType)
+VALUES (supp_id_seq.NEXTVAL, 'Kebun Pak Uzair', 'Uzair bin Ali', '019-1112222', 'pakuzair@farm.com', 'LOCALFARM');
+
+INSERT INTO SUPPLIER (SupplierId, SupplierName, SupplierContact, SupplierPhone, SupplierEmail, SupplierType)
+VALUES (supp_id_seq.NEXTVAL, 'DFarm Fruit', 'Mr. Awie', '03-8889999', 'contact@dfarmfruit.com', 'DISTRIBUTOR');
+
+//TABLE Inheritance LOCALFARM DAN DISTRIBUTOR
+INSERT INTO LOCALFARM (SupplierId, FarmAddress) VALUES (5000, 'Bemban, Melaka');
+INSERT INTO DISTRIBUTOR (SupplierId, BusinessLicenseNo, DistributionCenterId, LogisticPartner) 
+VALUES (5001, 'LLN12345', 'DC-SOUTH-01', 'Lalamove');
+
+//TABLE FRUITS
+INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
+VALUES (fruit_id_seq.NEXTVAL, 'Durian Musang King', 50.00, 20, 'LOCAL', SYSDATE, 5000);
+
+INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
+VALUES (fruit_id_seq.NEXTVAL, 'Anggur', 2.50, 100, 'IMPORTED', SYSDATE, 5001);
+
+//TABLE ORDERS
+INSERT INTO ORDERS (OrderId, OrderDate, CustId, StaffId, TotalAmount, PaymentMethod, OrderStatus)
+VALUES (order_id_seq.NEXTVAL, SYSDATE, 1000, 3000, 52.50, 'QR', 'COMPLETED');
+
+//TABLE ORDERDETAILS
+INSERT INTO ORDERDETAILS (OrderDetailsId, OrderId, FruitId, Quantity)
+VALUES (orderdtl_id_seq .NEXTVAL, 4000, 100, 1);
+
+INSERT INTO ORDERDETAILS (OrderDetailsId, OrderId, FruitId, Quantity)
+VALUES (orderdtl_id_seq.NEXTVAL, 4000, 101, 1);
+
+COMMIT;
