@@ -1,30 +1,35 @@
 <?php
 session_start();
-require_once('db_conn.php');
+require_once('db_conn.php'); 
 
 if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
     // ---------------------------------------------------------
-    // LANGKAH 1: Semak dalam jadual STAFFS dahulu
+    // Semak dalam jadual STAFFS sahaja
     // ---------------------------------------------------------
-    $sql_staff = "SELECT StaffId, StaffName, StaffRole FROM STAFFS 
-                  WHERE StaffEmail = :email AND StaffPassword = :pass";
+    // Menggunakan bind variables (:email, :pass) untuk keselamatan [cite: 10]
+    $sql = "SELECT StaffId, StaffName, StaffRole FROM STAFFS 
+            WHERE StaffEmail = :email AND StaffPassword = :pass";
 
-    $stid_staff = oci_parse($dbconn, $sql_staff);
-    oci_bind_by_name($stid_staff, ":email", $email);
-    oci_bind_by_name($stid_staff, ":pass", $password);
-    oci_execute($stid_staff);
+    $stid = oci_parse($dbconn, $sql); // Pastikan guna $dbconn ikut fail config anda
+
+    oci_bind_by_name($stid, ":email", $email);
+    oci_bind_by_name($stid, ":pass", $password);
     
-    $row_staff = oci_fetch_array($stid_staff, OCI_ASSOC);
+    oci_execute($stid);
+    
+    // Mengambil hasil data
+    $row = oci_fetch_array($stid, OCI_ASSOC);
 
-    if ($row_staff) {
-        // --- JIKA STAFF ATAU ADMIN ---
-        $_SESSION['user_id'] = $row_staff['STAFFID'];
-        $_SESSION['user_name'] = $row_staff['STAFFNAME'];
-        $_SESSION['user_role'] = $row_staff['STAFFROLE']; // 'ADMIN' atau 'STAFF'
+    if ($row) {
+        // --- JIKA LOGIN BERJAYA (STAFF ATAU ADMIN) ---
+        $_SESSION['user_id'] = $row['STAFFID'];
+        $_SESSION['user_name'] = $row['STAFFNAME'];
+        $_SESSION['user_role'] = $row['STAFFROLE']; 
 
+        // Navigasi berdasarkan peranan (Role) 
         if ($_SESSION['user_role'] == 'ADMIN') {
             header("Location: admin_dashboard.php");
         } else {
@@ -33,41 +38,15 @@ if (isset($_POST['login'])) {
         exit();
 
     } else {
-        // ---------------------------------------------------------
-        // LANGKAH 2: Jika bukan Staff, semak jadual CUSTOMER pula
-        // ---------------------------------------------------------
-        // Nota: Jadual CUSTOMER tiada kolum 'Role', jadi kita set manual
-        $sql_cust = "SELECT CUSTID, CUSTNAME FROM CUSTOMER 
-                     WHERE CUSTEMAIL = :email AND CUSTPASSWORD = :pass";
-
-        $stid_cust = oci_parse($dbconn, $sql_cust);
-        oci_bind_by_name($stid_cust, ":email", $email);
-        oci_bind_by_name($stid_cust, ":pass", $password);
-        oci_execute($stid_cust);
-
-        $row_cust = oci_fetch_array($stid_cust, OCI_ASSOC);
-
-        if ($row_cust) {
-            // --- JIKA CUSTOMER ---
-            $_SESSION['user_id'] = $row_cust['CUSTID'];
-            $_SESSION['user_name'] = $row_cust['CUSTNAME'];
-            $_SESSION['user_role'] = 'CUSTOMER'; // Set secara manual
-
-            // Hantar Customer ke halaman utama kedai (bukan dashboard admin)
-            header("Location: dashboard.php"); 
-            exit();
-        } else {
-            // ---------------------------------------------------------
-            // LANGKAH 3: Jika dua-dua tiada, baru paparkan error
-            // ---------------------------------------------------------
-            header("Location: login.php?error=1");
-            exit();
-        }
-        oci_free_statement($stid_cust);
+        // --- JIKA LOGIN GAGAL ---
+        // Terus hantar error kerana kita tidak lagi menyemak Customer
+        header("Location: login.php?error=1");
+        exit();
     }
     
-    oci_free_statement($stid_staff);
-    oci_close($dbconn);  
+    // Membersihkan resource
+    oci_free_statement($stid);
+    oci_close($dbconn);
 }
 ?>
 <!DOCTYPE html>
