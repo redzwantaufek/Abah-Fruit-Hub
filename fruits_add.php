@@ -99,11 +99,11 @@ if (isset($_POST['save_item'])) {
             
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label class="small fw-bold">Price (RM)</label>
+                    <label class="small fw-bold">Price Per KG (RM)</label>
                     <input type="number" step="0.01" name="price" class="form-control" required>
                 </div>
                 <div class="col-md-6">
-                    <label class="small fw-bold">Initial Stock</label>
+                    <label class="small fw-bold">Initial Stock in KG</label>
                     <input type="number" name="stock" class="form-control" required>
                 </div>
             </div>
