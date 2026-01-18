@@ -1,80 +1,58 @@
 <?php
 session_start();
 require_once('db_conn.php');
-
-// Security Check: Admin Only
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'ADMIN') {
-    header("Location: login.php");
-    exit();
-}
-
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include('includes/header.php'); 
 ?>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-white fw-bold text-shadow">
-            <i class="fas fa-chart-bar me-2"></i>Report & Analytics Hub
-        </h2>
-    </div>
+    <h2 class="fw-bold text-white text-shadow mb-4"><i class="fas fa-chart-pie me-2"></i>Analytics & Report Hub</h2>
 
     <div class="row g-4">
+        
         <div class="col-md-4">
-            <div class="glass-card h-100 text-center p-4">
+            <div class="glass-card h-100 text-center p-5 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                    <i class="fas fa-file-invoice-dollar fa-5x text-primary"></i>
+                </div>
                 <div class="mb-3 text-primary">
-                    <i class="fas fa-file-invoice-dollar fa-4x"></i>
+                    <i class="fas fa-calendar-alt fa-4x"></i> 
                 </div>
-                <h4 class="fw-bold">Monthly Sales</h4>
-                <p class="text-muted small">Detailed view of sales revenue, units sold, and grand totals filtered by month and year.</p>
-                <a href="monthly_report.php" class="btn btn-primary w-100 fw-bold">Open Report</a>
+                <h4 class="fw-bold mt-3">Monthly Sales</h4>
+                <p class="text-muted small">View detailed sales revenue broken down by month and year.</p>
+                <a href="monthly_report.php" class="btn btn-primary w-100 fw-bold shadow mt-2 rounded-pill">View Report</a>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="glass-card h-100 text-center p-4">
+            <div class="glass-card h-100 text-center p-5 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                    <i class="fas fa-exclamation-triangle fa-5x text-danger"></i>
+                </div>
                 <div class="mb-3 text-danger">
-                    <i class="fas fa-exclamation-triangle fa-4x"></i>
+                    <i class="fas fa-boxes fa-4x"></i> 
                 </div>
-                <h4 class="fw-bold">Inventory Alerts</h4>
-                <p class="text-muted small">Track low stock items (< 15 units) and fruits that are expiring within the next 7 days.</p>
-                <a href="inventory_report.php" class="btn btn-danger w-100 fw-bold">Open Report</a>
+                <h4 class="fw-bold mt-3">Inventory Alerts</h4>
+                <p class="text-muted small">Track low stock items and expiring products urgently.</p>
+                <a href="inventory_report.php" class="btn btn-danger w-100 fw-bold shadow mt-2 rounded-pill">View Report</a>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="glass-card h-100 text-center p-4">
-                <div class="mb-3 text-success">
-                    <i class="fas fa-medal fa-4x"></i>
+            <div class="glass-card h-100 text-center p-5 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-25">
+                    <i class="fas fa-chart-line fa-5x text-warning"></i>
                 </div>
-                <h4 class="fw-bold">Top Products</h4>
-                <p class="text-muted small">Visual analysis of the top 5 best-selling fruits to help with future stock planning.</p>
-                <a href="topselling_fruit_report.php" class="btn btn-success w-100 fw-bold">Open Report</a>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="glass-card h-100 text-center p-4">
                 <div class="mb-3 text-warning">
-                    <i class="fas fa-id-badge fa-4x"></i>
+                    <i class="fas fa-user-tie fa-4x"></i> 
                 </div>
-                <h4 class="fw-bold">Staff Performance</h4>
-                <p class="text-muted small">Analyze transactions and total sales collection for each employee in the system.</p>
-                <a href="staff_performance.php" class="btn btn-warning w-100 fw-bold">Open Report</a>
+                <h4 class="fw-bold mt-3">Staff Performance</h4>
+                <p class="text-muted small">Analyze sales collection and total transactions by employee.</p>
+                <a href="staff_performance.php" class="btn btn-warning w-100 fw-bold shadow mt-2 rounded-pill">View Report</a>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="glass-card h-100 text-center p-4">
-                <div class="mb-3 text-info">
-                    <i class="fas fa-users-cog fa-4x"></i>
-                </div>
-                <h4 class="fw-bold">Customer Lists</h4>
-                <p class="text-muted small">Quick exportable list of all registered customers and their contact details.</p>
-                <a href="customer.php" class="btn btn-info text-white w-100 fw-bold">Open List</a>
-            </div>
-        </div>
     </div>
 </div>
-
 </body>
 </html>

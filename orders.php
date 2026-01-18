@@ -52,15 +52,16 @@ include('includes/header.php');
                     <th>Order ID</th>
                     <th>Date</th>
                     <th>Customer</th>
-                    <th>Staff In Charge</th>
+                    <th>Payment</th> <th>Staff</th>
                     <th class="text-end">Total Amount</th>
-                    <th class="text-center">Status</th>
                     <th class="text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT o.OrderId, o.OrderDate, o.TotalAmount, o.OrderStatus, c.CustName, s.StaffName
+                // Ambil column PaymentMethod
+                $sql = "SELECT o.OrderId, o.OrderDate, o.TotalAmount, o.OrderStatus, o.PaymentMethod, 
+                               c.CustName, s.StaffName
                         FROM ORDERS o
                         JOIN CUSTOMER c ON o.CustId = c.CustId
                         LEFT JOIN STAFFS s ON o.StaffId = s.StaffId ";
@@ -80,13 +81,25 @@ include('includes/header.php');
                 oci_execute($stmt);
 
                 while ($row = oci_fetch_array($stmt, OCI_ASSOC)) {
+                    // Logic Icon Payment
+                    $pay = $row['PAYMENTMETHOD'];
+                    $payBadge = "";
+                    
+                    if ($pay == 'QR') {
+                        $payBadge = '<span class="badge bg-info text-dark rounded-pill"><i class="fas fa-qrcode me-1"></i> QR Pay</span>';
+                    } elseif ($pay == 'CARD') {
+                        $payBadge = '<span class="badge bg-warning text-dark rounded-pill"><i class="fas fa-credit-card me-1"></i> Card</span>';
+                    } else {
+                        $payBadge = '<span class="badge bg-success rounded-pill"><i class="fas fa-money-bill-wave me-1"></i> Cash</span>';
+                    }
+
                     echo "<tr>";
                     echo "<td><strong>#" . $row['ORDERID'] . "</strong></td>";
                     echo "<td>" . date('d-m-Y h:i A', strtotime($row['ORDERDATE'])) . "</td>";
                     echo "<td>" . htmlspecialchars($row['CUSTNAME']) . "</td>";
+                    echo "<td>" . $payBadge . "</td>";
                     echo "<td>" . htmlspecialchars($row['STAFFNAME'] ? $row['STAFFNAME'] : 'N/A') . "</td>";
                     echo "<td class='text-end fw-bold text-primary'>RM " . number_format($row['TOTALAMOUNT'], 2) . "</td>";
-                    echo "<td class='text-center'><span class='badge bg-success rounded-pill px-3 shadow-sm'>" . $row['ORDERSTATUS'] . "</span></td>";
                     echo "<td class='text-center'>
                             <a href='order_details.php?id=".$row['ORDERID']."' class='btn btn-sm btn-light text-info fw-bold shadow-sm rounded-pill px-3'>
                                 <i class='fas fa-eye me-1'></i> View
@@ -103,9 +116,9 @@ include('includes/header.php');
 <script>
     $(document).ready(function() {
         var table = $('#tableOrders').DataTable({
-            "dom": "rtip", // Hide default controls
+            "dom": "rtip",
             "pageLength": 10,
-            "columnDefs": [{ "orderable": false, "targets": [6] }],
+            "columnDefs": [{ "orderable": false, "targets": [6] }], 
             "language": {
                 "info": "<span class='text-muted small'>Showing _START_ to _END_ of _TOTAL_ orders</span>",
                 "paginate": { "next": "<i class='fas fa-chevron-right small'></i>", "previous": "<i class='fas fa-chevron-left small'></i>" }

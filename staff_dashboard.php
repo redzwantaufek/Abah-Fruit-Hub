@@ -2,77 +2,59 @@
 session_start();
 require_once('db_conn.php');
 
-// --- SECURITY CHECK: LOGIN REQUIRED ---
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-// --------------------------------------
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+include('includes/header.php');
 
-include('includes/header.php'); 
+$uid = $_SESSION['user_id'];
 
-// Kira Jualan Staff Ini Hari Ini
-$my_id = $_SESSION['user_id'];
-$sql_sale = "SELECT COUNT(*) AS TOTAL_ORDER, SUM(TotalAmount) AS TOTAL_RM 
-             FROM ORDERS 
-             WHERE StaffId = :sid AND TRUNC(OrderDate) = TRUNC(SYSDATE)";
-$stmt = oci_parse($dbconn, $sql_sale);
-oci_bind_by_name($stmt, ":sid", $my_id);
-oci_execute($stmt);
-$stat = oci_fetch_array($stmt, OCI_ASSOC);
+// Get Personal Sales Today
+$q1 = "SELECT COUNT(*) as TXN, NVL(SUM(TotalAmount), 0) as TOTAL 
+       FROM ORDERS 
+       WHERE StaffId = :sid AND TRUNC(OrderDate) = TRUNC(SYSDATE)";
+$s1 = oci_parse($dbconn, $q1);
+oci_bind_by_name($s1, ":sid", $uid);
+oci_execute($s1);
+$my_stats = oci_fetch_assoc($s1);
 ?>
 
 <div class="container-fluid">
-    <div class="alert alert-primary">
-        <h4><i class="fas fa-user-tag"></i> Dashboard Staff</h4>
-        <p>Selamat Datang, <strong><?php echo $_SESSION['user_name']; ?></strong>. Selamat bekerja!</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-white text-shadow mb-0">Hello, <?php echo explode(' ', $_SESSION['user_name'])[0]; ?>! 👋</h3>
+            <p class="text-white-50 small">Ready to make some sales today?</p>
+        </div>
+        <a href="sales_form.php" class="btn btn-warning fw-bold shadow px-4 py-2 rounded-pill">
+            <i class="fas fa-cash-register me-2"></i> New Sales
+        </a>
     </div>
 
-    <div class="row mb-4">
+    <div class="row g-4">
         <div class="col-md-6">
-            <div class="card bg-success text-white p-3">
-                <h5>Jualan Saya Hari Ini</h5>
-                <h3>RM <?php echo number_format($stat['TOTAL_RM'] ?? 0, 2); ?></h3>
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+                <div class="position-absolute end-0 bottom-0 p-3 opacity-25">
+                    <i class="fas fa-wallet fa-5x text-success"></i>
+                </div>
+                <h6 class="fw-bold text-muted text-uppercase">My Sales Today</h6>
+                <h1 class="display-4 fw-bold text-success">RM <?php echo number_format($my_stats['TOTAL'], 2); ?></h1>
+                <p class="text-muted fw-bold mb-0"><?php echo $my_stats['TXN']; ?> Transactions processed</p>
             </div>
         </div>
+
         <div class="col-md-6">
-            <div class="card bg-info text-white p-3">
-                <h5>Bilangan Resit Hari Ini</h5>
-                <h3><?php echo $stat['TOTAL_ORDER']; ?> Transaksi</h3>
+            <div class="glass-card p-4 h-100">
+                <h6 class="fw-bold text-muted mb-3">Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    <a href="sales_form.php" class="btn btn-primary fw-bold text-start p-3 shadow-sm">
+                        <i class="fas fa-plus-circle me-2"></i> Create New Order
+                    </a>
+                    <a href="orders.php" class="btn btn-info fw-bold text-start p-3 shadow-sm text-white">
+                        <i class="fas fa-history me-2"></i> View My Sales History
+                    </a>
+                    <a href="fruits.php" class="btn btn-light fw-bold text-start p-3 shadow-sm border">
+                        <i class="fas fa-search me-2"></i> Check Fruit Stock
+                    </a>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <h5 class="mb-3">Tindakan Pantas</h5>
-    <div class="row">
-        <div class="col-md-4">
-            <a href="sales_form.php" class="text-decoration-none">
-                <div class="card card-custom p-4 text-center hover-shadow border-primary">
-                    <i class="fas fa-cash-register fa-3x text-primary mb-3"></i>
-                    <h4>Buat Jualan Baru</h4>
-                    <p class="text-muted">Masuk order pelanggan & tolak stok</p>
-                </div>
-            </a>
-        </div>
-        
-        <div class="col-md-4">
-            <a href="customer_add.php" class="text-decoration-none">
-                <div class="card card-custom p-4 text-center hover-shadow">
-                    <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
-                    <h4>Daftar Pelanggan</h4>
-                    <p class="text-muted">Jika pelanggan baru datang kedai</p>
-                </div>
-            </a>
-        </div>
-
-        <div class="col-md-4">
-            <a href="fruits.php" class="text-decoration-none">
-                <div class="card card-custom p-4 text-center hover-shadow">
-                    <i class="fas fa-boxes fa-3x text-warning mb-3"></i>
-                    <h4>Semak Stok Buah</h4>
-                    <p class="text-muted">Lihat baki buah dalam kedai</p>
-                </div>
-            </a>
         </div>
     </div>
 </div>

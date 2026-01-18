@@ -1,55 +1,39 @@
 <?php
 session_start();
-// Memanggil fail sambungan pangkalan data [cite: 10, 12]
-require_once('db_conn.php'); 
+require_once('db_conn.php');
 
-if (isset($_POST['login'])) {
-    // Mengambil data dari borang login
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+if (!isset($_POST['email']) || !isset($_POST['password'])) {
+    header("Location: login.php"); exit();
+}
 
-    // SQL Query untuk menyemak staf berdasarkan Email dan Password [cite: 10]
-    // Menggunakan bind variables (:email, :pass) untuk keselamatan data
-    $sql = "SELECT StaffId, StaffName, StaffRole FROM STAFFS 
-            WHERE StaffEmail = :email AND StaffPassword = :pass";
+$email = $_POST['email'];
+$pass  = $_POST['password'];
 
-    $stid = oci_parse($dbconn, $sql);
+// Check user
+$q = "SELECT * FROM STAFFS WHERE StaffEmail = :em";
+$stmt = oci_parse($dbconn, $q);
+oci_bind_by_name($stmt, ":em", $email);
+oci_execute($stmt);
 
-    // Mengikat pembolehubah PHP ke dalam SQL Oracle
-    oci_bind_by_name($stid, ":email", $email);
-    oci_bind_by_name($stid, ":pass", $password);
+$user = oci_fetch_array($stmt, OCI_ASSOC);
 
-    // Menjalankan arahan SQL
-    oci_execute($stid);
+if ($user) {
+    // Simple password check (In real app, use password_verify)
+    if ($pass === $user['STAFFPASSWORD']) {
+        $_SESSION['user_id'] = $user['STAFFID'];
+        $_SESSION['user_name'] = $user['STAFFNAME'];
+        $_SESSION['user_role'] = $user['STAFFROLE'];
 
-    // Mengambil satu baris hasil jualan jika wujud
-    $row = oci_fetch_array($stid, OCI_ASSOC);
-
-    if ($row) {
-        // Jika data dijumpai, simpan maklumat ke dalam SESSION
-        $_SESSION['user_id'] = $row['STAFFID'];
-        $_SESSION['user_name'] = $row['STAFFNAME'];
-        $_SESSION['user_role'] = $row['STAFFROLE'];
-
-        // Menentukan hala tuju berdasarkan Role (Admin atau Staff) 
-        if ($_SESSION['user_role'] == 'ADMIN') {
+        // Redirect based on role
+        if ($user['STAFFROLE'] == 'ADMIN') {
             header("Location: admin_dashboard.php");
         } else {
             header("Location: staff_dashboard.php");
         }
-        exit();
     } else {
-        // Jika gagal, hantar kembali ke login.php dengan mesej ralat
-        header("Location: login.php?error=1");
-        exit();
+        header("Location: login.php?error=Incorrect password");
     }
-
-    // Menutup kenyataan dan sambungan
-    oci_free_statement($stid);
-    oci_close($conn);
 } else {
-    // Jika akses fail tanpa tekan butang login
-    header("Location: login.php");
-    exit();
+    header("Location: login.php?error=User not found");
 }
 ?>
