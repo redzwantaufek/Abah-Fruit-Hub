@@ -28,8 +28,10 @@ if (isset($_POST['submit_sale'])) {
             $total_amount = $price * $qty;
             $new_order_id = 0;
 
+            // UPDATED: Using 'order_id_seq'
             $sql_ord = "INSERT INTO ORDERS (OrderId, OrderDate, CustId, StaffId, TotalAmount, PaymentMethod, OrderStatus) 
-                        VALUES (order_seq.NEXTVAL, SYSDATE, :cid, :sid, :tot, :pay, 'COMPLETED') RETURNING OrderId INTO :new_oid";
+                        VALUES (order_id_seq.NEXTVAL, SYSDATE, :cid, :sid, :tot, :pay, 'COMPLETED') RETURNING OrderId INTO :new_oid";
+            
             $stmt_ord = oci_parse($dbconn, $sql_ord);
             oci_bind_by_name($stmt_ord, ":cid", $cust_id);
             oci_bind_by_name($stmt_ord, ":sid", $staff_id);
@@ -38,7 +40,10 @@ if (isset($_POST['submit_sale'])) {
             oci_bind_by_name($stmt_ord, ":new_oid", $new_order_id, -1, SQLT_INT);
             oci_execute($stmt_ord, OCI_NO_AUTO_COMMIT);
 
-            $sql_dtl = "INSERT INTO ORDERDETAILS (OrderDetailsId, OrderId, FruitId, Quantity) VALUES (orderdtl_seq.NEXTVAL, :oid, :fid, :qty)";
+            // UPDATED: Using 'orderdtl_id_seq'
+            $sql_dtl = "INSERT INTO ORDERDETAILS (OrderDetailsId, OrderId, FruitId, Quantity) 
+                        VALUES (orderdtl_id_seq.NEXTVAL, :oid, :fid, :qty)";
+            
             $stmt_dtl = oci_parse($dbconn, $sql_dtl);
             oci_bind_by_name($stmt_dtl, ":oid", $new_order_id);
             oci_bind_by_name($stmt_dtl, ":fid", $fruit_id);

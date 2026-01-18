@@ -2,8 +2,8 @@
 
 /* php & Oracle DB connection file */
 
-$username = "SYSTEM";
-$password = "123";
+$username = "ict502";
+$password = "system";
 $database = "localhost/FREEPDB1"; // Format: host/service_name
 
 $dbconn = oci_connect($username, $password, $database);

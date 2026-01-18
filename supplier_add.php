@@ -26,13 +26,25 @@ if (isset($_POST['submit'])) {
     $center = $_POST['center_id'];
     $logistic = $_POST['logistic'];
 
-    // 1. Ambil ID
-    $s_seq = oci_parse($dbconn, "SELECT supplier_id_seq.NEXTVAL AS NEXT_ID FROM DUAL");
-    oci_execute($s_seq);
+    // 1. Ambil ID dari Sequence (UPDATED to match your SQL: supp_id_seq)
+    $sql_seq = "SELECT supp_id_seq.NEXTVAL AS NEXT_ID FROM DUAL";
+    $s_seq = oci_parse($dbconn, $sql_seq);
+    
+    if (!oci_execute($s_seq)) {
+        $e = oci_error($s_seq);
+        echo "<script>Swal.fire('Database Error', 'Sequence supp_id_seq missing! Run your SQL command.', 'error');</script>";
+        exit();
+    }
+
     $r_seq = oci_fetch_array($s_seq, OCI_ASSOC);
     $new_id = $r_seq['NEXT_ID'];
 
-    // 2. Insert Parent
+    if (!$new_id) {
+        echo "<script>Swal.fire('Error', 'Failed to generate Supplier ID', 'error');</script>";
+        exit();
+    }
+
+    // 2. Insert Parent (SUPPLIER)
     $sql_main = "INSERT INTO SUPPLIER (SupplierId, SupplierName, SupplierContact, SupplierPhone, SupplierEmail, SupplierType) 
                  VALUES (:id, :nm, :con, :ph, :em, :typ)";
     $stmt1 = oci_parse($dbconn, $sql_main);
@@ -45,14 +57,16 @@ if (isset($_POST['submit'])) {
     
     $execute_main = oci_execute($stmt1, OCI_NO_AUTO_COMMIT);
 
-    // 3. Insert Child
+    // 3. Insert Child (LOCALFARM or DISTRIBUTOR)
     $execute_child = false;
+    
     if ($type == 'LOCALFARM') {
         $sql_child = "INSERT INTO LOCALFARM (SupplierId, FarmAddress) VALUES (:id, :faddr)";
         $stmt2 = oci_parse($dbconn, $sql_child);
         oci_bind_by_name($stmt2, ":id", $new_id);
         oci_bind_by_name($stmt2, ":faddr", $farm_addr);
         $execute_child = oci_execute($stmt2, OCI_NO_AUTO_COMMIT);
+        
     } else if ($type == 'DISTRIBUTOR') {
         $sql_child = "INSERT INTO DISTRIBUTOR (SupplierId, BusinessLicenseNo, DistributionCenterId, LogisticPartner) 
                       VALUES (:id, :lic, :dc, :log)";
@@ -64,14 +78,14 @@ if (isset($_POST['submit'])) {
         $execute_child = oci_execute($stmt2, OCI_NO_AUTO_COMMIT);
     }
 
-    // 4. Commit or Rollback with SweetAlert
+    // 4. Commit or Rollback
     if ($execute_main && $execute_child) {
         oci_commit($dbconn);
         echo "
         <script>
             Swal.fire({
                 title: 'Berjaya!',
-                text: 'Supplier baru berjaya ditambah.',
+                text: 'Supplier baru berjaya ditambah (ID: $new_id).',
                 icon: 'success',
                 confirmButtonColor: '#198754'
             }).then(() => {
@@ -80,7 +94,8 @@ if (isset($_POST['submit'])) {
         </script>";
     } else {
         oci_rollback($dbconn);
-        $e = oci_error($stmt1);
+        $e = oci_error($stmt1); // Check parent error
+        if (!$e && isset($stmt2)) $e = oci_error($stmt2); // Check child error
         echo "<script>Swal.fire('Ralat', 'Gagal menyimpan data: " . $e['message'] . "', 'error');</script>";
     }
 }
