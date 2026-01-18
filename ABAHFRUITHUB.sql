@@ -117,7 +117,7 @@ CREATE TABLE FRUITS (
     FruitId NUMBER(5),
     FruitName VARCHAR2(100),
     FruitPrice NUMBER(10, 2),
-    QuantityStock NUMBER(10) DEFAULT 0,
+    QuantityStock NUMBER(10, 2) DEFAULT 0,--tukar ni
     Category VARCHAR2(50),
     ExpireDate DATE,
     ImageURL VARCHAR2(255),
