@@ -90,8 +90,8 @@ $role = isset($_SESSION['user_role']) ? $_SESSION['user_role'] : '';
 <div class="d-flex">
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4 class="fw-bold mb-0 text-white"><i class="fas fa-apple-alt me-2 text-success"></i>FruitHub</h4>
-            <small class="text-white-50">System v2.0</small>
+            <h4 class="fw-bold mb-0 text-white"><i class="fas fa-apple-alt me-2 text-success"></i>Abah FruitHub</h4>
+            <small class="text-white-50">System v1.0</small>
         </div>
         
         <div class="flex-grow-1 overflow-auto py-3">

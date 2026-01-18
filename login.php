@@ -55,7 +55,7 @@ if (isset($_SESSION['user_id'])) {
 <div class="glass-login text-center">
     <div class="mb-4">
         <i class="fas fa-apple-alt fa-3x text-success mb-2"></i>
-        <h3 class="fw-bold text-dark">FruitHub System</h3>
+        <h3 class="fw-bold text-dark">Abah FruitHub System</h3>
         <p class="text-muted small">Please sign in to continue</p>
     </div>
 
@@ -91,7 +91,7 @@ if (isset($_SESSION['user_id'])) {
     </form>
     
     <div class="mt-4 text-muted small">
-        &copy; 2026 FruitHub Management
+        &copy; 2026 Abah FruitHub Management System
     </div>
 </div>
 
