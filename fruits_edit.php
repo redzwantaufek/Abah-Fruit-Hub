@@ -2,7 +2,12 @@
 session_start();
 require_once('db_conn.php');
 
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'ADMIN') { header("Location: login.php"); exit(); }
+// 1. SECURITY UPDATE:
+// Buang check ADMIN di sini juga.
+if (!isset($_SESSION['user_id'])) { 
+    header("Location: login.php"); exit(); 
+}
+
 include('includes/header.php');
 
 $fid = $_GET['id'] ?? null;
@@ -10,7 +15,6 @@ if (!$fid) { header("Location: fruits.php"); exit(); }
 
 $msg = "";
 
-// 1. DAPATKAN DATA LAMA
 $q_get = "SELECT * FROM FRUITS WHERE FruitId = :fid";
 $s_get = oci_parse($dbconn, $q_get);
 oci_bind_by_name($s_get, ":fid", $fid);
@@ -19,11 +23,9 @@ $item = oci_fetch_array($s_get, OCI_ASSOC);
 
 if (!$item) { echo "<script>alert('Item not found.'); window.location='fruits.php';</script>"; exit(); }
 
-// SAFETY FIX: Pastikan key IMAGEURL wujud walaupun database return huruf kecil/besar
-// Kita check semua variasi ejaan yang mungkin
+// Fix untuk key gambar
 $current_db_img = $item['IMAGEURL'] ?? $item['ImageURL'] ?? $item['imageurl'] ?? '';
 
-// 2. PROSES UPDATE
 if (isset($_POST['update_item'])) {
     $name  = $_POST['name'];
     $price = $_POST['price'];
@@ -32,11 +34,9 @@ if (isset($_POST['update_item'])) {
     $exp   = $_POST['expire_date'];
     $supp  = $_POST['supplier_id'];
     
-    // Default: Guna gambar lama (yang kita dah fix kat atas tadi)
     $final_img = $current_db_img; 
     $proceed = true;
 
-    // JIKA USER UPLOAD GAMBAR BARU
     if (isset($_FILES['fruit_img']) && $_FILES['fruit_img']['error'] == 0) {
         $fileName = $_FILES['fruit_img']['name'];
         $fileSize = $_FILES['fruit_img']['size'];
@@ -46,31 +46,17 @@ if (isset($_POST['update_item'])) {
         $imageExtension = explode('.', $fileName);
         $imageExtension = strtolower(end($imageExtension));
 
-        // 1. Validation Format
         if (!in_array($imageExtension, $validImageExtension)) {
-            $msg = "Swal.fire('Error', 'Invalid Format (JPG/PNG only)', 'error');";
-            $proceed = false;
-        }
-        // 2. Validation Size (Max 2MB)
-        else if ($fileSize > 2000000) { 
-            $msg = "Swal.fire('Error', 'Image too large (Max 2MB)', 'error');";
-            $proceed = false;
-        }
-        // 3. Upload File Baru
-        else {
+            $msg = "Swal.fire('Error', 'Invalid Format.', 'error');"; $proceed = false;
+        } else if ($fileSize > 2000000) { 
+            $msg = "Swal.fire('Error', 'Image too large.', 'error');"; $proceed = false;
+        } else {
             $newImageName = time() . "." . $imageExtension;
             $target = "assets/img/" . $newImageName;
-            
-            if (move_uploaded_file($tmpName, $target)) {
-                $final_img = $newImageName; // Tukar variable ke nama baru
-            } else {
-                $msg = "Swal.fire('Error', 'Failed to upload image.', 'error');";
-                $proceed = false;
-            }
+            if (move_uploaded_file($tmpName, $target)) { $final_img = $newImageName; }
         }
     }
 
-    // Jalankan UPDATE SQL hanya jika validation lulus
     if ($proceed) {
         $q_upd = "UPDATE FRUITS SET FruitName=:nm, FruitPrice=:pr, QuantityStock=:st, 
                   Category=:cat, ExpireDate=TO_DATE(:exp, 'YYYY-MM-DD'), SupplierId=:sup, ImageURL=:img 
@@ -88,7 +74,6 @@ if (isset($_POST['update_item'])) {
 
         if (oci_execute($stmt)) {
             $msg = "Swal.fire('Updated!', 'Item details updated.', 'success').then(() => { window.location = 'fruits.php'; });";
-            // Kemaskini variable tempatan untuk paparan preview serta-merta
             $current_db_img = $final_img; 
         } else {
             $e = oci_error($stmt);
@@ -97,22 +82,16 @@ if (isset($_POST['update_item'])) {
     }
 }
 ?>
-
 <script><?php echo $msg; ?></script>
 
 <div class="container mt-4">
     <div class="glass-card mx-auto p-4" style="max-width: 600px;">
         <h4 class="mb-4 text-primary fw-bold"><i class="fas fa-edit me-2"></i>Edit Fruit</h4>
-        
         <form method="POST" enctype="multipart/form-data">
-            
             <div class="mb-4 text-center">
                 <div class="bg-light border rounded d-inline-block p-3 mb-2" style="width: 150px; height: 150px; overflow: hidden;">
                     <?php 
-                        // Logic nak tunjuk gambar lama atau placeholder
                         $show_img = "https://via.placeholder.com/150?text=No+Image";
-                        
-                        // Guna variable $current_db_img yang dah kita 'fix' kat atas
                         if (!empty($current_db_img) && file_exists("assets/img/" . $current_db_img)) {
                             $show_img = "assets/img/" . $current_db_img;
                         }
@@ -120,7 +99,6 @@ if (isset($_POST['update_item'])) {
                     <img id="preview" src="<?php echo $show_img; ?>" class="w-100 h-100 object-fit-cover">
                 </div>
                 <input type="file" name="fruit_img" class="form-control form-control-sm mt-2" accept="image/*" onchange="previewImage(this)">
-                <small class="text-muted d-block mt-1">Leave empty to keep current image (Max 2MB)</small>
             </div>
 
             <div class="mb-3">
@@ -168,27 +146,17 @@ if (isset($_POST['update_item'])) {
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" name="update_item" class="btn btn-primary fw-bold flex-grow-1 shadow-sm">
-                    Save Changes
-                </button>
+                <button type="submit" name="update_item" class="btn btn-primary fw-bold flex-grow-1 shadow-sm">Save Changes</button>
                 <a href="fruits.php" class="btn btn-secondary fw-bold shadow-sm">Cancel</a>
             </div>
         </form>
     </div>
 </div>
-
 <script>
 function previewImage(input) {
     if (input.files && input.files[0]) {
-        if(input.files[0].size > 2097152) {
-             alert("File is too big! Max 2MB.");
-             input.value = "";
-             return;
-        }
         var reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById('preview').src = e.target.result;
-        }
+        reader.onload = function (e) { document.getElementById('preview').src = e.target.result; }
         reader.readAsDataURL(input.files[0]);
     }
 }
