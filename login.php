@@ -21,9 +21,7 @@ if (isset($_SESSION['user_id'])) {
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-family: 'Segoe UI', sans-serif;
         }
         @keyframes gradient {
@@ -36,25 +34,20 @@ if (isset($_SESSION['user_id'])) {
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
-            width: 100%;
-            max-width: 400px;
+            width: 100%; max-width: 400px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.5);
         }
-        .form-control {
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
+        .form-control { border-radius: 10px; padding: 12px; border: 1px solid #ddd; }
         .btn-login {
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #11998e, #38ef7d);
-            border: none;
+            border-radius: 10px; padding: 12px; font-weight: bold;
+            background: linear-gradient(45deg, #11998e, #38ef7d); border: none;
             transition: transform 0.2s;
         }
         .btn-login:hover { transform: scale(1.02); }
+        /* Style untuk butang mata */
+        .btn-eye { cursor: pointer; background: white; border: 1px solid #ddd; border-left: 0; }
+        .btn-eye:hover { background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -85,7 +78,10 @@ if (isset($_SESSION['user_id'])) {
             <label class="fw-bold small ms-1">Password</label>
             <div class="input-group">
                 <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-muted"></i></span>
-                <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+                <input type="password" name="password" id="passInput" class="form-control border-start-0 border-end-0" placeholder="••••••••" required>
+                <span class="input-group-text btn-eye" onclick="togglePass()">
+                    <i class="fas fa-eye text-muted" id="eyeIcon"></i>
+                </span>
             </div>
         </div>
 
@@ -99,5 +95,21 @@ if (isset($_SESSION['user_id'])) {
     </div>
 </div>
 
+<script>
+function togglePass() {
+    var x = document.getElementById("passInput");
+    var icon = document.getElementById("eyeIcon");
+    
+    if (x.type === "password") {
+        x.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        x.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+</script>
 </body>
 </html>

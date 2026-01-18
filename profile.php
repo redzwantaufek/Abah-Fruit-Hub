@@ -2,16 +2,12 @@
 session_start();
 require_once('db_conn.php');
 
-// Check login
-if (!isset($_SESSION['user_id'])) { 
-    header("Location: login.php"); 
-    exit(); 
-}
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 
 include('includes/header.php');
 
 $uid = $_SESSION['user_id'];
-$msg = ""; // Simpan message alert
+$msg = ""; 
 
 // Update Personal Details
 if (isset($_POST['save_profile'])) {
@@ -38,7 +34,6 @@ if (isset($_POST['save_pass'])) {
     $new_pass  = $_POST['new_pass'];
     $cfm_pass  = $_POST['cfm_pass'];
 
-    // Verify old password
     $check = oci_parse($dbconn, "SELECT StaffPassword FROM STAFFS WHERE StaffId = :id");
     oci_bind_by_name($check, ":id", $uid);
     oci_execute($check);
@@ -46,7 +41,6 @@ if (isset($_POST['save_pass'])) {
 
     if ($row && $curr_pass == $row['STAFFPASSWORD']) {
         if ($new_pass === $cfm_pass) {
-            // Update password
             $q_upd = "UPDATE STAFFS SET StaffPassword = :np WHERE StaffId = :id";
             $s = oci_parse($dbconn, $q_upd);
             oci_bind_by_name($s, ":np", $new_pass);
@@ -133,26 +127,51 @@ $me = oci_fetch_array($s_user, OCI_ASSOC);
                 <form method="POST">
                     <div class="mb-2">
                         <label class="small fw-bold">Current Password</label>
-                        <input type="password" name="curr_pass" class="form-control" required>
+                        <div class="input-group">
+                            <input type="password" name="curr_pass" id="p1" class="form-control" required>
+                            <button type="button" class="btn btn-light border" onclick="toggle('p1')"><i class="fas fa-eye text-muted"></i></button>
+                        </div>
                     </div>
 
                     <div class="mb-2">
                         <label class="small fw-bold">New Password</label>
-                        <input type="password" name="new_pass" class="form-control" maxlength="20" required>
+                        <div class="input-group">
+                            <input type="password" name="new_pass" id="p2" class="form-control" maxlength="20" required>
+                            <button type="button" class="btn btn-light border" onclick="toggle('p2')"><i class="fas fa-eye text-muted"></i></button>
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="small fw-bold">Confirm Password</label>
-                        <input type="password" name="cfm_pass" class="form-control" maxlength="20" required>
+                        <div class="input-group">
+                            <input type="password" name="cfm_pass" id="p3" class="form-control" maxlength="20" required>
+                            <button type="button" class="btn btn-light border" onclick="toggle('p3')"><i class="fas fa-eye text-muted"></i></button>
+                        </div>
                     </div>
 
                     <button type="submit" name="save_pass" class="btn btn-danger w-100 fw-bold shadow-sm">
                         Update Password
                     </button>
                 </form>
+                
+                <p class="text-muted text-center mt-3" style="font-size: 0.8rem;">
+                    *Keep your password safe.
+                </p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Fungsi ringkas untuk Profile Page (boleh guna ulang)
+function toggle(id) {
+    var x = document.getElementById(id);
+    if (x.type === "password") {
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
+}
+</script>
 </body>
 </html>
