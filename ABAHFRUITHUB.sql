@@ -157,13 +157,13 @@ CREATE TABLE ORDERDETAILS (
 
 //TABLE STAFF
 INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
-VALUES (staff_id_seq.NEXTVAL, 'Miran bin Sudie', 5000, 'Merlimau, Melaka', 'admin@fruitstall.com', '012-1112222', NULL, 'admin123', 'ADMIN', SYSDATE);
+VALUES (staff_id_seq.NEXTVAL, 'Miran bin Sudie', 5000, 'Merlimau, Melaka', 'admin@fruithub.com', '012-1112222', NULL, 'admin123', 'ADMIN', SYSDATE);
 
 INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
-VALUES (staff_id_seq.NEXTVAL, 'Izzairi bin Syafiq', 2500, 'Jasin, Melaka', 'izzairi@fruitstall.com', '012-3334444', 3000, 'staffali', 'STAFF', SYSDATE);
+VALUES (staff_id_seq.NEXTVAL, 'Izzairi bin Syafiq', 2500, 'Jasin, Melaka', 'izzairi@fruithub.com', '012-3334444', 3000, 'staffali', 'STAFF', SYSDATE);
 
 INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
-VALUES (staff_id_seq.NEXTVAL, 'Izzat bin Abu', 2500, 'Bandar Melaka', 'izzat@fruitstall.com', '012-5556666', 3000, 'staffizzat', 'STAFF', SYSDATE);
+VALUES (staff_id_seq.NEXTVAL, 'Izzat bin Abu', 2500, 'Bandar Melaka', 'izzat@fruithub.com', '012-5556666', 3000, 'staffizzat', 'STAFF', SYSDATE);
 
 //TABLE CUSTOMER
 INSERT INTO CUSTOMER (CustId, CustName, CustPhone, CustEmail, CustAddress)

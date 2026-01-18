@@ -2,14 +2,7 @@
 session_start();
 require_once('db_conn.php');
 
-
-// --- SECURITY CHECK: LOGIN REQUIRED ---
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-// --------------------------------------
-
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'ADMIN') { header("Location: login.php"); exit(); }
 include('includes/header.php');
 
 if (isset($_POST['submit'])) {
@@ -17,10 +10,9 @@ if (isset($_POST['submit'])) {
     $price = $_POST['price'];
     $stock = $_POST['stock'];
     $cat = $_POST['category'];
-    $exp = $_POST['expire_date']; // Format YYYY-MM-DD dari HTML
-    $supp = $_POST['supplier'];
+    $exp = $_POST['expire_date'];
+    $supp = $_POST['supplier_id'];
 
-    // SQL INSERT dengan Sequence dan TO_DATE
     $sql = "INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId) 
             VALUES (fruit_id_seq.NEXTVAL, :nm, :pr, :st, :cat, TO_DATE(:exp, 'YYYY-MM-DD'), :sup)";
     
@@ -33,77 +25,54 @@ if (isset($_POST['submit'])) {
     oci_bind_by_name($stmt, ":sup", $supp);
 
     if (oci_execute($stmt)) {
-    // --- POPUP BERJAYA (Centang Hijau) ---
-    echo "
-    <script>
-        Swal.fire({
-            title: 'Berjaya!',
-            text: 'Data telah selamat disimpan.',
-            icon: 'success', 
-            confirmButtonColor: '#198754',
-            confirmButtonText: 'OK'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location = 'fruits.php'; // Redirect ke senarai lepas tekan OK
-            }
-        });
-    </script>";
-} else {
-    // --- POPUP GAGAL (Pangkah Merah) ---
-    $e = oci_error($stmt);
-    // Kita guna json_encode supaya error message tak rosakkan koding JS
-    $pesan_error = json_encode($e['message']); 
-    
-    echo "
-    <script>
-        Swal.fire({
-            title: 'Ralat!',
-            text: 'Gagal menyimpan data: ' + $pesan_error,
-            icon: 'error',
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Cuba Lagi'
-        });
-    </script>";
-}
+        echo "<script>Swal.fire('Success!', 'New fruit added successfully.', 'success').then(() => { window.location = 'fruits.php'; });</script>";
+    } else {
+        $e = oci_error($stmt);
+        echo "<script>Swal.fire('Error', '" . $e['message'] . "', 'error');</script>";
+    }
 }
 ?>
 
-<div class="container">
-    <div class="card card-custom p-4 mt-4" style="max-width: 600px; margin: auto;">
-        <h3 class="mb-3">Tambah Buah Baru</h3>
+<div class="container mt-4">
+    <div class="glass-card mx-auto p-4" style="max-width: 600px;">
+        <h3 class="mb-4 text-primary fw-bold"><i class="fas fa-apple-alt me-2"></i>Add New Fruit</h3>
         
         <form method="POST">
             <div class="mb-3">
-                <label>Nama Buah</label>
-                <input type="text" name="name" class="form-control" required>
+                <label class="fw-bold">Fruit Name</label>
+                <input type="text" name="name" class="form-control" required placeholder="e.g. Red Apple">
             </div>
-            <div class="row">
-                <div class="col">
-                    <label>Harga (RM)</label>
-                    <input type="number" step="0.01" name="price" class="form-control" required>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="fw-bold">Price (RM)</label>
+                    <input type="number" step="0.01" name="price" class="form-control" required placeholder="0.00">
                 </div>
-                <div class="col">
-                    <label>Stok Awal</label>
-                    <input type="number" name="stock" class="form-control" required>
+                <div class="col-md-6">
+                    <label class="fw-bold">Initial Stock</label>
+                    <input type="number" name="stock" class="form-control" required placeholder="0">
                 </div>
             </div>
-            <div class="mb-3 mt-3">
-                <label>Kategori</label>
-                <select name="category" class="form-select">
-                    <option value="Tempatan">Tempatan</option>
-                    <option value="Import">Import</option>
-                </select>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="fw-bold">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="LOCAL">Local</option>
+                        <option value="IMPORTED">Imported</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Expiry Date</label>
+                    <input type="date" name="expire_date" class="form-control" required>
+                </div>
             </div>
-            <div class="mb-3">
-                <label>Tarikh Luput</label>
-                <input type="date" name="expire_date" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label>Supplier</label>
-                <select name="supplier" class="form-select">
+
+            <div class="mb-4">
+                <label class="fw-bold">Supplier</label>
+                <select name="supplier_id" class="form-select">
                     <?php
-                    // Tarik data Supplier untuk Dropdown
-                    $s = oci_parse($dbconn, "SELECT SupplierId, SupplierName FROM SUPPLIER");
+                    $s = oci_parse($dbconn, "SELECT SupplierId, SupplierName FROM SUPPLIER ORDER BY SupplierName");
                     oci_execute($s);
                     while ($r = oci_fetch_array($s, OCI_ASSOC)) {
                         echo "<option value='".$r['SUPPLIERID']."'>".$r['SUPPLIERNAME']."</option>";
@@ -111,8 +80,15 @@ if (isset($_POST['submit'])) {
                     ?>
                 </select>
             </div>
-            <button type="submit" name="submit" class="btn btn-success w-100">Simpan Data</button>
-            <a href="fruits.php" class="btn btn-secondary w-100 mt-2">Batal</a>
+
+            <div class="d-flex gap-2">
+                <button type="submit" name="submit" class="btn btn-success fw-bold flex-grow-1 shadow">
+                    <i class="fas fa-save me-2"></i> Save Item
+                </button>
+                <a href="fruits.php" class="btn btn-secondary fw-bold shadow">Cancel</a>
+            </div>
         </form>
     </div>
 </div>
+</body>
+</html>

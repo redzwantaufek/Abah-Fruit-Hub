@@ -3,94 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Stall Management System</title>
+    <title>FruitHub Management System</title>
     
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/sweetalert2.min.css">
-    <link rel="stylesheet" href="assets/css/dataTables.bootstrap5.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/sweetalert2.min.js"></script>
-    <script src="assets/js/jquery.dataTables.min.js"></script>
-    <script src="assets/js/dataTables.bootstrap5.min.js"></script>
-    <script src="assets/js/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* BACKGROUND ANIMASI */
         body {
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
         }
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        /* SIDEBAR (Fix Scroll & Position) */
         .sidebar {
-            min-height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
+            height: 100vh;
+            width: 260px;
+            background: rgba(33, 37, 41, 0.95);
             backdrop-filter: blur(10px);
-            color: white;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: fixed;
+            top: 0; left: 0; z-index: 1000;
+            display: flex; flex-direction: column;
+            overflow-y: auto;
         }
-        .sidebar a { color: #ddd; text-decoration: none; display: block; padding: 12px; border-radius: 8px; transition: 0.3s; }
-        .sidebar a:hover { background-color: rgba(255, 255, 255, 0.2); color: white; transform: translateX(5px); }
-        
+
+        /* Scrollbar Sidebar Cantik */
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .sidebar a {
+            color: #cfd2d6;
+            text-decoration: none;
+            display: block;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: translateX(5px);
+        }
+        .sidebar .section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #adb5bd;
+            padding: 20px 20px 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* CONTENT AREA */
+        .content-wrapper {
+            margin-left: 260px;
+            padding: 30px;
+            width: calc(100% - 260px);
+        }
+
+        /* GLASS CARD */
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             margin-bottom: 20px;
+            overflow: hidden;
         }
-        .content { padding: 20px; }
-        
-        .btn-jualan { 
+
+        /* DATATABLES STYLING */
+        .dataTables_wrapper .dataTables_length, 
+        .dataTables_wrapper .dataTables_filter {
+            color: #333 !important; 
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .dataTables_wrapper .dataTables_info, 
+        .dataTables_wrapper .dataTables_paginate {
+            color: #333 !important; 
+            margin-top: 10px;
+        }
+        .dataTables_wrapper input[type="search"], 
+        .dataTables_wrapper select {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 5px;
+        }
+
+        /* Button POS Special */
+        .btn-pos {
             background: linear-gradient(45deg, #ffc107, #ffca2c);
-            color: #000 !important; font-weight: bold; border-radius: 8px; margin: 10px 0; text-align: center; 
+            color: #000; font-weight: bold; border: none;
             box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
         }
-        .btn-jualan:hover { transform: scale(1.05); }
+        .btn-pos:hover { transform: scale(1.02); background: #fff; }
+        .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
+        /* HIDE DEFAULT SEARCH IF CLASS .no-search EXISTS */
+        .no-search-wrapper .dataTables_filter,
+        .no-search-wrapper .dataTables_length {
+             display: none !important;
+        }
+
+        /* --- PRINT CSS --- */
         @media print {
-            .sidebar, .btn, .navbar, form { display: none !important; }
-            .glass-card { border: 1px solid #000; box-shadow: none; width: 100%; position: absolute; top: 0; left: 0; }
-            body { background: white !important; animation: none; }
+            .sidebar, .btn, .d-print-none,
+            .dataTables_wrapper .dataTables_length, 
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_paginate {
+                display: none !important;
+            }
+            .content-wrapper { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+            body { background: white !important; -webkit-print-color-adjust: exact; }
+            .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; background: white !important; }
+            * { color: black !important; text-shadow: none !important; }
+            a[href]:after { content: none !important; }
         }
     </style>
 </head>
 <body>
+
 <div class="d-flex">
-    <div class="sidebar p-3" style="width: 250px;">
-        <h4 class="text-center mb-4"><i class="fas fa-apple-alt"></i> FruitHub</h4>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4 class="fw-bold mb-0 text-white"><i class="fas fa-apple-alt me-2 text-success"></i>FruitHub</h4>
+            <small class="text-white-50">System v2.0</small>
+        </div>
         
-        <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'ADMIN') { ?>
-            <a href="admin_dashboard.php"><i class="fas fa-home me-2"></i> Dashboard</a>
-        <?php } else { ?>
-            <a href="staff_dashboard.php"><i class="fas fa-home me-2"></i> Dashboard</a>
-        <?php } ?>
+        <div class="flex-grow-1 overflow-auto">
+            <div class="px-3 my-3">
+                <a href="sales_form.php" class="btn btn-pos w-100 text-start text-dark"><i class="fas fa-cash-register me-2"></i> New Sale / POS</a>
+            </div>
+            
+            <a href="admin_dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'admin_dashboard.php' ? 'active' : ''; ?>"><i class="fas fa-home me-2"></i> Dashboard</a>
+            
+            <div class="section-title">Operations</div>
+            <a href="fruits.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'fruits.php' ? 'active' : ''; ?>"><i class="fas fa-boxes me-2"></i> Fruit Stock</a>
+            <a href="orders.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'orders.php' ? 'active' : ''; ?>"><i class="fas fa-receipt me-2"></i> Sales History</a>
 
-        <a href="sales_form.php" class="btn-jualan"><i class="fas fa-cash-register me-2"></i> New Sale</a>
-        <a href="fruits.php"><i class="fas fa-boxes me-2"></i> Fruit Stock</a>
-        <a href="orders.php"><i class="fas fa-receipt me-2"></i> Sales History</a>
+            <div class="section-title">Administration</div>
+            <a href="staff.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'staff.php' ? 'active' : ''; ?>"><i class="fas fa-users-cog me-2"></i> Staff Management</a>
+            <a href="customer.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'customer.php' ? 'active' : ''; ?>"><i class="fas fa-users me-2"></i> Customers</a>
+            <a href="supplier.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'supplier.php' ? 'active' : ''; ?>"><i class="fas fa-truck me-2"></i> Suppliers</a>
+            <a href="report_list.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'report_list.php' ? 'active' : ''; ?>"><i class="fas fa-chart-pie me-2"></i> Report Hub</a>
+        </div>
 
-        <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'ADMIN') { ?>
-            <hr class="bg-light">
-            <small class="text-uppercase text-muted ms-2" style="font-size: 0.7rem;">Admin Area</small>
-            <a href="staff.php"><i class="fas fa-users me-2"></i> Staff Management</a>
-            <a href="customer.php"><i class="fas fa-user-friends me-2"></i> Customers</a>
-            <a href="supplier.php"><i class="fas fa-truck me-2"></i> Suppliers</a>
-        <?php } ?>
-
-        <hr class="bg-light">
-        <a href="profile.php"><i class="fas fa-user-circle me-2"></i> My Profile</a>
-        <a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+        <div class="p-3 border-top border-secondary mt-auto">
+            <a href="profile.php"><i class="fas fa-user-circle me-2"></i> My Profile</a>
+            <a href="logout.php" class="text-danger mt-1"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
+        </div>
     </div>
     
-    <div class="content flex-grow-1"></div>
+    <div class="content-wrapper">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Auto-Enable Search Table (Kecuali yang ada class no-search atau table-cart)
+        $('.table:not(.table-cart):not(.no-search)').DataTable({
+            "language": {
+                "search": "", 
+                "searchPlaceholder": "Search records...",
+                "lengthMenu": "_MENU_ entries per page",
+            },
+            "pageLength": 10,
+            "lengthChange": true
+        });
+
+        // Enable Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
