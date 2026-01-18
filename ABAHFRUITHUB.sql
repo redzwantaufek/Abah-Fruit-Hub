@@ -155,7 +155,7 @@ CREATE TABLE ORDERDETAILS (
     CONSTRAINT orderdetails_fruitid_fk FOREIGN KEY (FruitId) REFERENCES FRUITS(FruitId)
 );
 
-//TABLE STAFF
+--TABLE STAFF
 INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
 VALUES (staff_id_seq.NEXTVAL, 'Miran bin Sudie', 5000, 'Merlimau, Melaka', 'admin@fruithub.com', '012-1112222', NULL, 'admin123', 'ADMIN', SYSDATE);
 
@@ -165,37 +165,37 @@ VALUES (staff_id_seq.NEXTVAL, 'Izzairi bin Syafiq', 2500, 'Jasin, Melaka', 'izza
 INSERT INTO STAFFS (StaffId, StaffName, StaffSalary, StaffAddress, StaffEmail, StaffPhone, ManagerId, StaffPassword, StaffRole, HireDate)
 VALUES (staff_id_seq.NEXTVAL, 'Izzat bin Abu', 2500, 'Bandar Melaka', 'izzat@fruithub.com', '012-5556666', 3000, 'staffizzat', 'STAFF', SYSDATE);
 
-//TABLE CUSTOMER
+--TABLE CUSTOMER
 INSERT INTO CUSTOMER (CustId, CustName, CustPhone, CustEmail, CustAddress)
 VALUES (cust_id_seq.NEXTVAL, 'Redzwan', '013-1234567', 'redzwan@gmail.com', 'Taman Seri Mendapat, Melaka');
 
 INSERT INTO CUSTOMER (CustId, CustName, CustPhone, CustEmail, CustAddress)
 VALUES (cust_id_seq.NEXTVAL, 'Niel', '017-9876543', 'niel@gmail.com', 'Taman Seri Mendapat, Melaka');
 
-//TABLE SUPPLIER
+--TABLE SUPPLIER
 INSERT INTO SUPPLIER (SupplierId, SupplierName, SupplierContact, SupplierPhone, SupplierEmail, SupplierType)
 VALUES (supp_id_seq.NEXTVAL, 'Kebun Pak Uzair', 'Uzair bin Ali', '019-1112222', 'pakuzair@farm.com', 'LOCALFARM');
 
 INSERT INTO SUPPLIER (SupplierId, SupplierName, SupplierContact, SupplierPhone, SupplierEmail, SupplierType)
 VALUES (supp_id_seq.NEXTVAL, 'DFarm Fruit', 'Mr. Awie', '03-8889999', 'contact@dfarmfruit.com', 'DISTRIBUTOR');
 
-//TABLE Inheritance LOCALFARM DAN DISTRIBUTOR
+--TABLE Inheritance LOCALFARM DAN DISTRIBUTOR
 INSERT INTO LOCALFARM (SupplierId, FarmAddress) VALUES (5000, 'Bemban, Melaka');
 INSERT INTO DISTRIBUTOR (SupplierId, BusinessLicenseNo, DistributionCenterId, LogisticPartner) 
 VALUES (5001, 'LLN12345', 'DC-SOUTH-01', 'Lalamove');
 
-//TABLE FRUITS
+--TABLE FRUITS
 INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
 VALUES (fruit_id_seq.NEXTVAL, 'Durian Musang King', 50.00, 20, 'LOCAL', '31-JAN-2026', 5000);
 
 INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
 VALUES (fruit_id_seq.NEXTVAL, 'Anggur', 2.50, 100, 'IMPORTED', '30-JAN-2026', 5001);
 
-//TABLE ORDERS
+--TABLE ORDERS
 INSERT INTO ORDERS (OrderId, OrderDate, CustId, StaffId, TotalAmount, PaymentMethod, OrderStatus)
 VALUES (order_id_seq.NEXTVAL, SYSDATE, 1000, 3000, 52.50, 'QR', 'COMPLETED');
 
-//TABLE ORDERDETAILS
+--TABLE ORDERDETAILS
 INSERT INTO ORDERDETAILS (OrderDetailsId, OrderId, FruitId, Quantity)
 VALUES (orderdtl_id_seq .NEXTVAL, 4000, 100, 1);
 
