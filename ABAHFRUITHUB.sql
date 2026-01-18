@@ -186,10 +186,10 @@ VALUES (5001, 'LLN12345', 'DC-SOUTH-01', 'Lalamove');
 
 //TABLE FRUITS
 INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
-VALUES (fruit_id_seq.NEXTVAL, 'Durian Musang King', 50.00, 20, 'LOCAL', SYSDATE, 5000);
+VALUES (fruit_id_seq.NEXTVAL, 'Durian Musang King', 50.00, 20, 'LOCAL', '31-JAN-2026', 5000);
 
 INSERT INTO FRUITS (FruitId, FruitName, FruitPrice, QuantityStock, Category, ExpireDate, SupplierId)
-VALUES (fruit_id_seq.NEXTVAL, 'Anggur', 2.50, 100, 'IMPORTED', SYSDATE, 5001);
+VALUES (fruit_id_seq.NEXTVAL, 'Anggur', 2.50, 100, 'IMPORTED', '30-JAN-2026', 5001);
 
 //TABLE ORDERS
 INSERT INTO ORDERS (OrderId, OrderDate, CustId, StaffId, TotalAmount, PaymentMethod, OrderStatus)
