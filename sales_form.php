@@ -4,9 +4,7 @@ require_once('db_conn.php');
 if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include('includes/header.php');
 
-// Dapatkan nama staff dari session
 $current_staff_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Unknown Staff';
-
 $msg = "";
 
 if (isset($_POST['checkout'])) {
@@ -33,7 +31,6 @@ if (isset($_POST['checkout'])) {
 
         if (oci_execute($stmt, OCI_NO_AUTO_COMMIT)) {
             $success = true;
-            
             for ($i = 0; $i < count($items); $i++) {
                 $fid = $items[$i];
                 $qty = $qtys[$i];
@@ -83,18 +80,27 @@ if (isset($_POST['checkout'])) {
                 $s = oci_parse($dbconn, $q);
                 oci_execute($s);
                 while ($f = oci_fetch_assoc($s)) {
+                    // Logic Gambar Assets/Img
+                    $img_src = "assets/img/" . $f['IMAGEURL'];
+                    
+                    if (empty($f['IMAGEURL']) || !file_exists($img_src)) {
+                        // Kalau tiada gambar, guna icon
+                        $display_img = "<div class='bg-light rounded mx-auto d-flex align-items-center justify-content-center mb-2 shadow-sm' style='width:100%; height:120px;'><i class='fas fa-apple-alt fa-3x text-success'></i></div>";
+                    } else {
+                        // Kalau ada gambar
+                        $display_img = "<img src='$img_src' class='rounded w-100 mb-2 shadow-sm' style='height: 120px; object-fit: cover;'>";
+                    }
                 ?>
                 <div class="col-md-3 col-6 fruit-card" data-name="<?php echo strtolower($f['FRUITNAME']); ?>">
-                    <div class="glass-card p-3 h-100 text-center position-relative btn-add-cart" 
+                    <div class="glass-card p-2 h-100 text-center position-relative btn-add-cart" 
                          style="cursor: pointer; transition: transform 0.2s;"
                          onclick="addToCart(<?php echo $f['FRUITID']; ?>, '<?php echo htmlspecialchars($f['FRUITNAME']); ?>', <?php echo $f['FRUITPRICE']; ?>, <?php echo $f['QUANTITYSTOCK']; ?>)">
                         
-                        <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2 shadow-sm" style="width:60px; height:60px;">
-                            <i class="fas fa-apple-alt fa-2x text-success"></i>
-                        </div>
-                        <h6 class="fw-bold mb-1 text-truncate"><?php echo $f['FRUITNAME']; ?></h6>
+                        <?php echo $display_img; ?>
+
+                        <h6 class="fw-bold mb-1 text-truncate small"><?php echo $f['FRUITNAME']; ?></h6>
                         <span class="badge bg-primary rounded-pill">RM <?php echo number_format($f['FRUITPRICE'], 2); ?></span>
-                        <small class="d-block text-muted mt-1">Stock: <?php echo $f['QUANTITYSTOCK']; ?></small>
+                        <small class="d-block text-muted mt-1" style="font-size: 0.7rem;">Stock: <?php echo $f['QUANTITYSTOCK']; ?></small>
                     </div>
                 </div>
                 <?php } ?>
