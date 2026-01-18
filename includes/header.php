@@ -18,7 +18,6 @@
     <script src="assets/js/chart.js"></script>
 
     <style>
-        /* CSS Animasi Background */
         body {
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
@@ -31,7 +30,6 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        /* CSS Sidebar */
         .sidebar {
             min-height: 100vh;
             background: rgba(0, 0, 0, 0.6);
@@ -42,7 +40,6 @@
         .sidebar a { color: #ddd; text-decoration: none; display: block; padding: 12px; border-radius: 8px; transition: 0.3s; }
         .sidebar a:hover { background-color: rgba(255, 255, 255, 0.2); color: white; transform: translateX(5px); }
         
-        /* CSS Glass Card */
         .glass-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
@@ -54,15 +51,13 @@
         }
         .content { padding: 20px; }
         
-        /* Butang Jualan Kuning */
         .btn-jualan { 
             background: linear-gradient(45deg, #ffc107, #ffca2c);
             color: #000 !important; font-weight: bold; border-radius: 8px; margin: 10px 0; text-align: center; 
             box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
         }
         .btn-jualan:hover { transform: scale(1.05); }
-        
-        /* Print Style */
+
         @media print {
             .sidebar, .btn, .navbar, form { display: none !important; }
             .glass-card { border: 1px solid #000; box-shadow: none; width: 100%; position: absolute; top: 0; left: 0; }
@@ -81,22 +76,21 @@
             <a href="staff_dashboard.php"><i class="fas fa-home me-2"></i> Dashboard</a>
         <?php } ?>
 
-        <a href="sales_form.php" class="btn-jualan"><i class="fas fa-cash-register me-2"></i> Jualan Baru</a>
-        <a href="fruits.php"><i class="fas fa-boxes me-2"></i> Stok Buah</a>
-        <a href="orders.php"><i class="fas fa-receipt me-2"></i> Rekod Jualan</a>
+        <a href="sales_form.php" class="btn-jualan"><i class="fas fa-cash-register me-2"></i> New Sale</a>
+        <a href="fruits.php"><i class="fas fa-boxes me-2"></i> Fruit Stock</a>
+        <a href="orders.php"><i class="fas fa-receipt me-2"></i> Sales History</a>
 
         <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'ADMIN') { ?>
             <hr class="bg-light">
             <small class="text-uppercase text-muted ms-2" style="font-size: 0.7rem;">Admin Area</small>
-            <a href="staff.php"><i class="fas fa-users me-2"></i> Staff</a>
-            <a href="customer.php"><i class="fas fa-user-friends me-2"></i> Pelanggan</a>
-            <a href="supplier.php"><i class="fas fa-truck me-2"></i> Supplier</a>
+            <a href="staff.php"><i class="fas fa-users me-2"></i> Staff Management</a>
+            <a href="customer.php"><i class="fas fa-user-friends me-2"></i> Customers</a>
+            <a href="supplier.php"><i class="fas fa-truck me-2"></i> Suppliers</a>
         <?php } ?>
 
         <hr class="bg-light">
-        <a href="profile.php"><i class="fas fa-user-circle me-2"></i> Profil Saya</a>
-        
+        <a href="profile.php"><i class="fas fa-user-circle me-2"></i> My Profile</a>
         <a href="logout.php" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
     </div>
     
-    <div class="content flex-grow-1">
+    <div class="content flex-grow-1"></div>

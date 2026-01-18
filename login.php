@@ -2,12 +2,12 @@
 session_start();
 require_once('db_conn.php'); 
 
-// Logik Login (Berlaku dalam fail yang sama)
+// Login Logic (Occurs in the same file)
 if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // 1. Semak dalam jadual STAFFS
+    // 1. Check in STAFFS table
     $sql = "SELECT StaffId, StaffName, StaffRole FROM STAFFS 
             WHERE StaffEmail = :email AND StaffPassword = :pass";
 
@@ -21,12 +21,12 @@ if (isset($_POST['login'])) {
     $row = oci_fetch_array($stid, OCI_ASSOC);
 
     if ($row) {
-        // --- LOGIN BERJAYA ---
+        // --- LOGIN SUCCESS ---
         $_SESSION['user_id'] = $row['STAFFID'];
         $_SESSION['user_name'] = $row['STAFFNAME'];
         $_SESSION['user_role'] = $row['STAFFROLE']; 
 
-        // Redirect ikut Role
+        // Redirect based on Role
         if ($_SESSION['user_role'] == 'ADMIN') {
             header("Location: admin_dashboard.php");
         } else {
@@ -35,8 +35,10 @@ if (isset($_POST['login'])) {
         exit();
 
     } else {
-        // --- LOGIN GAGAL ---
-        $error_message = "Emel atau Kata Laluan tidak sah.";
+        // --- LOGIN FAILED ---
+        // Redirect back with an error flag
+        header("Location: login.php?error=1");
+        exit();
     }
     
     oci_free_statement($stid);
@@ -45,7 +47,7 @@ if (isset($_POST['login'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,7 +69,7 @@ if (isset($_POST['login'])) {
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         .card-header {
-            background-color: #198754; /* Hijau */
+            background-color: #198754; /* Green */
             color: white;
             text-align: center;
             border-top-left-radius: 15px !important;
@@ -91,21 +93,22 @@ if (isset($_POST['login'])) {
             <div class="card card-login">
                 <div class="card-header">
                     <h3><i class="fas fa-apple-alt me-2"></i>Abah FruitHub</h3>
-                    <p class="mb-0 small">Sistem Pengurusan Buah</p>
+                    <p class="mb-0 small">Fruit Management System</p>
                 </div>
                 
                 <div class="card-body p-4">
                     
                     <?php if(isset($_GET['error'])) { ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i> Emel atau Kata Laluan Salah!
+                            <i class="fas fa-exclamation-circle me-2"></i> Invalid Email or Password!
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     <?php } ?>
-                    <form action="process_login.php" method="POST">
+                    
+                    <form action="" method="POST">
                         
                         <div class="mb-3">
-                            <label class="form-label">Alamat Emel</label>
+                            <label class="form-label">Email Address</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 <input type="email" name="email" class="form-control" placeholder="staff@email.com" required>
@@ -113,7 +116,7 @@ if (isset($_POST['login'])) {
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">Kata Laluan</label>
+                            <label class="form-label">Password</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                 <input type="password" name="password" class="form-control" placeholder="••••••••" required>
@@ -122,7 +125,7 @@ if (isset($_POST['login'])) {
 
                         <div class="d-grid">
                             <button type="submit" name="login" class="btn btn-primary btn-login btn-lg">
-                                Log Masuk <i class="fas fa-sign-in-alt ms-2"></i>
+                                Login <i class="fas fa-sign-in-alt ms-2"></i>
                             </button>
                         </div>
 

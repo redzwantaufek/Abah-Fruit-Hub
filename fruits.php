@@ -2,15 +2,9 @@
 session_start();
 require_once('db_conn.php');
 
-// Security: Login Required
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include('includes/header.php'); 
 
-// --- Logic Delete ---
 if(isset($_GET['delete_id'])){
     $fid = $_GET['delete_id'];
     $sql_del = "DELETE FROM FRUITS WHERE FruitId = :fid";
@@ -18,20 +12,18 @@ if(isset($_GET['delete_id'])){
     oci_bind_by_name($stmt, ":fid", $fid);
     
     if(oci_execute($stmt)){
-        echo "<script>
-        Swal.fire('Berjaya!', 'Data buah telah dipadam.', 'success').then(() => { window.location = 'fruits.php'; });
-        </script>";
+        echo "<script>Swal.fire('Success!', 'Fruit data deleted successfully.', 'success').then(() => { window.location = 'fruits.php'; });</script>";
     } else {
         $e = oci_error($stmt);
-        echo "<script>Swal.fire('Ralat', '" . $e['message'] . "', 'error');</script>";
+        echo "<script>Swal.fire('Error!', '" . $e['message'] . "', 'error');</script>";
     }
 }
 ?>
 
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-white text-shadow">📦 Pengurusan Stok Buah</h2>
-        <a href="fruits_add.php" class="btn btn-warning fw-bold shadow"><i class="fas fa-plus"></i> Tambah Buah</a>
+        <h2 class="fw-bold text-white text-shadow">📦 Fruit Inventory</h2>
+        <a href="fruits_add.php" class="btn btn-warning fw-bold shadow"><i class="fas fa-plus"></i> Add New Fruit</a>
     </div>
 
     <div class="glass-card">
@@ -39,21 +31,18 @@ if(isset($_GET['delete_id'])){
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Nama Buah</th>
-                    <th>Harga (RM)</th>
-                    <th>Stok</th>
-                    <th>Kategori</th>
-                    <th>Luput</th>
+                    <th>Fruit Name</th>
+                    <th>Price (RM)</th>
+                    <th>Stock</th>
+                    <th>Category</th>
+                    <th>Expiry Date</th>
                     <th>Supplier</th>
-                    <th>Aksi</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT f.*, s.SupplierName 
-                        FROM FRUITS f 
-                        LEFT JOIN SUPPLIER s ON f.SupplierId = s.SupplierId
-                        ORDER BY f.FruitId ASC";
+                $sql = "SELECT f.*, s.SupplierName FROM FRUITS f LEFT JOIN SUPPLIER s ON f.SupplierId = s.SupplierId ORDER BY f.FruitId ASC";
                 $stmt = oci_parse($dbconn, $sql);
                 oci_execute($stmt);
 
@@ -71,9 +60,7 @@ if(isset($_GET['delete_id'])){
                     echo "<td>" . $row['SUPPLIERNAME'] . "</td>";
                     echo "<td class='text-center'>
                             <a href='fruits_edit.php?id=".$row['FRUITID']."' class='btn btn-sm btn-primary mb-1'><i class='fas fa-edit'></i></a>
-                            <button onclick='confirmDelete(\"".$row['FRUITID']."\")' class='btn btn-sm btn-danger mb-1'>
-                                <i class='fas fa-trash'></i>
-                            </button>
+                            <button onclick='confirmDelete(\"".$row['FRUITID']."\")' class='btn btn-sm btn-danger mb-1'><i class='fas fa-trash'></i></button>
                           </td>";
                     echo "</tr>";
                 }
@@ -85,19 +72,16 @@ if(isset($_GET['delete_id'])){
 
 <script>
     $(document).ready(function() { $('#tableBuah').DataTable(); });
-
     function confirmDelete(id) {
         Swal.fire({
-            title: 'Anda Pasti?',
-            text: "Data ini akan dihapuskan kekal.",
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Ya, Padam!'
+            confirmButtonText: 'Yes, Delete!'
         }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'fruits.php?delete_id=' + id;
-            }
+            if (result.isConfirmed) { window.location.href = 'fruits.php?delete_id=' + id; }
         })
     }
 </script>

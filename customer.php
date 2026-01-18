@@ -2,14 +2,9 @@
 session_start();
 require_once('db_conn.php');
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
+if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
 include('includes/header.php'); 
 
-// --- Logic Delete ---
 if(isset($_GET['delete_id'])){
     $cid = $_GET['delete_id'];
     $sql_del = "DELETE FROM CUSTOMER WHERE CustId = :cid";
@@ -17,18 +12,18 @@ if(isset($_GET['delete_id'])){
     oci_bind_by_name($stmt, ":cid", $cid);
     
     if(oci_execute($stmt)){
-        echo "<script>Swal.fire('Berjaya!', 'Pelanggan dipadam.', 'success').then(() => { window.location = 'customer.php'; });</script>";
+        echo "<script>Swal.fire('Success!', 'Customer deleted.', 'success').then(() => { window.location = 'customer.php'; });</script>";
     } else {
         $e = oci_error($stmt);
-        echo "<script>Swal.fire('Ralat', '" . $e['message'] . "', 'error');</script>";
+        echo "<script>Swal.fire('Error', '" . $e['message'] . "', 'error');</script>";
     }
 }
 ?>
 
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-white text-shadow">👫 Pengurusan Pelanggan</h2>
-        <a href="customer_add.php" class="btn btn-warning fw-bold shadow"><i class="fas fa-user-plus"></i> Daftar Pelanggan</a>
+        <h2 class="fw-bold text-white text-shadow">👫 Customer Management</h2>
+        <a href="customer_add.php" class="btn btn-warning fw-bold shadow"><i class="fas fa-user-plus"></i> Add Customer</a>
     </div>
 
     <div class="glass-card">
@@ -36,11 +31,11 @@ if(isset($_GET['delete_id'])){
             <thead class="table-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Nama Pelanggan</th>
-                    <th>No. Telefon</th>
-                    <th>Emel</th>
-                    <th>Alamat</th>
-                    <th>Aksi</th>
+                    <th>Customer Name</th>
+                    <th>Phone No.</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,13 +52,9 @@ if(isset($_GET['delete_id'])){
                     echo "<td>" . $row['CUSTEMAIL'] . "</td>";
                     echo "<td>" . $row['CUSTADDRESS'] . "</td>";
                     echo "<td class='text-center'>
-                         <a href='customer_edit.php?id=".$row['CUSTID']."' class='btn btn-sm btn-primary mb-1'>
-                         <i class='fas fa-edit'></i>
-                         </a>
-                         <button onclick='confirmDelete(\"".$row['CUSTID']."\")' class='btn btn-sm btn-danger mb-1'>
-                         <i class='fas fa-trash'></i>
-                         </button>
-                         </td>";
+                            <a href='customer_edit.php?id=".$row['CUSTID']."' class='btn btn-sm btn-primary mb-1'><i class='fas fa-edit'></i></a>
+                            <button onclick='confirmDelete(\"".$row['CUSTID']."\")' class='btn btn-sm btn-danger mb-1'><i class='fas fa-trash'></i></button>
+                          </td>";
                     echo "</tr>";
                 }
                 ?>
@@ -74,19 +65,16 @@ if(isset($_GET['delete_id'])){
 
 <script>
     $(document).ready(function() { $('#tableCust').DataTable(); });
-
     function confirmDelete(id) {
         Swal.fire({
-            title: 'Hapus Pelanggan?',
-            text: "Sejarah belian pelanggan ini juga mungkin terpadam.",
+            title: 'Delete Customer?',
+            text: "This might delete their purchase history too.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            confirmButtonText: 'Ya, Padam!'
+            confirmButtonText: 'Yes, Delete!'
         }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = 'customer.php?delete_id=' + id;
-            }
+            if (result.isConfirmed) { window.location.href = 'customer.php?delete_id=' + id; }
         })
     }
 </script>
